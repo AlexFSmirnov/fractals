@@ -5,8 +5,8 @@ function randint(min, max) {
 function get_pixel_color(x, y) {
     var r, g, b;
 
-    x = Math.round(x * 25);
-    y = Math.round(y * 25);
+    x = Math.round(x * 15);
+    y = Math.round(y * 15);
 
     if (x == 0 || y == 0) 
         [r, g, b] = [255, 0, 0];
@@ -19,12 +19,12 @@ function get_pixel_color(x, y) {
 }
 
 function draw_fractal() {
-    for (var canv_y = 0; canv_y < CANVAS_HEIGHT; canv_y++) {
-        for (var canv_x = 0; canv_x < CANVAS_WIDTH; canv_x++) {
+    for (var canv_y = 0; canv_y < canvas_h; canv_y++) {
+        for (var canv_x = 0; canv_x < canvas_w; canv_x++) {
             // real_x, real_y - real point coordinates on the complex plane.
             // canv_x, canv_y - canvas' points coordinates.
-            var real_x = (canv_x / CANVAS_WIDTH) * (cur_x2 - cur_x1) + cur_x1;
-            var real_y = (canv_y / CANVAS_HEIGHT) * (cur_y2 - cur_y1) + cur_y1;
+            var real_x = (canv_x / canvas_w) * (cur_x2 - cur_x1) + cur_x1;
+            var real_y = (canv_y / canvas_h) * (cur_y2 - cur_y1) + cur_y1;
             var color = get_pixel_color(real_x, real_y);
 
             ctx.fillStyle = color;
@@ -51,13 +51,23 @@ function setup() {
     canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
 
-    canvas.width = CANVAS_WIDTH;
-    canvas.height = CANVAS_HEIGHT;
 
-    cur_x1 = START_X1;
-    cur_y1 = START_Y1;
-    cur_x2 = START_X2;
-    cur_y2 = START_Y2;
+    // Finding perfect canvas resolution based on client's screen size.
+    var client_w = document.documentElement.clientWidth;
+    var client_h = document.documentElement.clientHeight;
+    var coeff = Math.sqrt(PIXEL_AMOUNT) / Math.sqrt(client_w * client_h);
+    canvas_w = Math.round(client_w * coeff);
+    canvas_h = Math.round(client_h * coeff);
+    canvas.width = canvas_w;
+    canvas.height = canvas_h;
+    
+    var plane_w = Math.sqrt(PLANE_AREA * (client_w / client_h));
+    var plane_h = Math.sqrt(PLANE_AREA * (client_h / client_w))
+
+    cur_x1 = -Math.round(plane_w) / 2;
+    cur_y1 = -Math.round(plane_h) / 2;
+    cur_x2 = Math.round(plane_w) / 2;
+    cur_y2 = Math.round(plane_h) / 2;
 
     draw_fractal();
     adjust_window();
