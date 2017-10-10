@@ -11,7 +11,7 @@ function get_pixel_color(x, y) {
     if (x == 0 || y == 0) 
         [r, g, b] = [255, 0, 0];
     else if (x % 10 == 0 || y % 10 == 0) 
-        [r, g, b] = [0, 0, 0];
+        [r, g, b] = [150, 150, 255];
     else 
         [r, g, b] = [0, 0, 255];
 
