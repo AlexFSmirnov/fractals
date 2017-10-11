@@ -37,7 +37,7 @@ function on_mouse_up() {
 
 function draw_selection(canvas, event) {
     if (is_selecting) {
-        var mouse_pos = getMousePos(canvas, event);
+        var mouse_pos = get_mouse_pos(canvas, event);
         sel_x2 = Math.round(mouse_pos.x);
         sel_y2 = Math.round(mouse_pos.y);
 
