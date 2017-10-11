@@ -163,10 +163,12 @@ function setup() {
     sel_canvas = document.getElementById('selection-canvas');
     sel_ctx = sel_canvas.getContext('2d');
 
-    sel_canvas.onmousedown = function(event) {on_mouse_down(sel_canvas, event);};
-    sel_canvas.onmousemove = function(event) {draw_selection(sel_canvas, event);};
-    sel_canvas.onmouseup = function(event) {on_mouse_up(sel_canvas, event);};
-
+    sel_canvas.addEventListener('mousedown', 
+        function(event) {on_mouse_down(sel_canvas, event)});
+    sel_canvas.addEventListener('mousemove',
+        function(event) {draw_selection(sel_canvas, event)});
+    sel_canvas.addEventListener('mouseup',
+        function(event) {on_mouse_up(sel_canvas, event)});
 
     // Finding perfect canvas resolution based on client's screen size.
     var client_w = document.documentElement.clientWidth;
