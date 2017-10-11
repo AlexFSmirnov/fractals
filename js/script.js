@@ -163,6 +163,7 @@ function setup() {
     sel_canvas = document.getElementById('selection-canvas');
     sel_ctx = sel_canvas.getContext('2d');
 
+    sel_canvas.addEventListener('click', function() {alert(1)});
     sel_canvas.addEventListener('mousedown', 
         function(event) {on_mouse_down(sel_canvas, event)});
     sel_canvas.addEventListener('mousemove',
