@@ -9,6 +9,10 @@ function randint(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function mod(n, m) {
+    return ((n % m) + m) % m;
+}
+
 /* MOUSE AND SELECTION */
 is_selecting = false;
 strict_selection = true;
@@ -102,15 +106,19 @@ function get_real_coords(canv_x, canv_y) {
 function get_pixel_color(x, y) {
     var r, g, b;
 
-    x = Math.round(x * 10);
-    y = Math.round(y * 10);
+    r = Math.round(128 + 128 * Math.sin(x + y));
+    g = Math.round(128 + (x + y));
+    b = Math.round(128 + 128 * Math.sin(x - y));
 
-    if (x == 0 || y == 0) 
-        [r, g, b] = [255, 0, 0];
-    else if (x % 10 == 0 || y % 10 == 0) 
-        [r, g, b] = [150, 150, 255];
-    else 
-        [r, g, b] = [0, 0, 255];
+//     x = Math.round(x * 10);
+//     y = Math.round(y * 10);
+// 
+//     if (x == 0 || y == 0) 
+//         [r, g, b] = [255, 0, 0];
+//     else if (x % 10 == 0 || y % 10 == 0) 
+//         [r, g, b] = [150, 150, 255];
+//     else 
+//         [r, g, b] = [0, 0, 255];
 
     return "rgb(" + r + ", " + g + ", " + b + ")";
 }
@@ -128,6 +136,7 @@ function draw_fractal() {
             frac_ctx.fillStyle = color;
             frac_ctx.fillRect(canv_x, canv_y, 1, 1);
         }
+        console.log(canv_y);
     }
 }
 /* (END) DRAWING FUNCTIONS (END) */
