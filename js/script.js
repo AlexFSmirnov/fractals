@@ -11,7 +11,7 @@ function randint(min, max) {
 
 /* MOUSE AND SELECTION */
 is_selecting = false;
-strict_selection = false;  // TODO
+strict_selection = true;
 function  get_mouse_pos(canvas, evt) {
   var rect = canvas.getBoundingClientRect(), // abs. size of element
       scaleX = canvas.width / rect.width,    // relationship bitmap vs. element for X
@@ -40,6 +40,17 @@ function draw_selection(canvas, event) {
         var mouse_pos = get_mouse_pos(canvas, event);
         sel_x2 = Math.round(mouse_pos.x);
         sel_y2 = Math.round(mouse_pos.y);
+
+        // Selection box has the same aspect ratio as client's screen.
+        if (strict_selection) {
+            var sel_h = Math.round(Math.abs(sel_x2 - sel_x1) *
+                                   (sel_canvas.height / sel_canvas.width));
+            if (sel_y2 >= sel_y1) {
+                sel_y2 = sel_y1 + sel_h;
+            } else {
+                sel_y2 = sel_y1 - sel_h;
+            }
+        }
 
         // Clearing the canvas.
         sel_ctx.clearRect(0, 0, sel_canvas.width, sel_canvas.height);
