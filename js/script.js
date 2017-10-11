@@ -30,9 +30,21 @@ function on_mouse_down(canvas, event) {
 
     is_selecting = true;
 }
-function on_mouse_up() {
+
+function on_mouse_up(canvas, event) {
     is_selecting = false;
     sel_ctx.clearRect(0, 0, sel_canvas.width, sel_canvas.height);
+    
+    // Zooming in the real coordinates.
+    // sel_x2, sel_y2 are global, so we have their values from draw_selection()
+    var real_coords_1 = get_real_coords(sel_x1, sel_y1);
+    var real_coords_2 = get_real_coords(sel_x2, sel_y2);
+    cur_x1 = real_coords_1.x;
+    cur_y1 = real_coords_1.y;
+    cur_x2 = real_coords_2.x;
+    cur_y2 = real_coords_2.y;
+
+    draw_fractal();
 }
 
 function draw_selection(canvas, event) {
@@ -56,11 +68,11 @@ function draw_selection(canvas, event) {
         sel_ctx.clearRect(0, 0, sel_canvas.width, sel_canvas.height);
 
         // Drawing selection.
-        drawRect(sel_ctx, sel_x1, sel_y1, sel_x2, sel_y2, 2);
+        draw_selection_rect(sel_ctx, sel_x1, sel_y1, sel_x2, sel_y2, 2);
     }
 }
 
-function drawRect(ctx, x1, y1, x2, y2, w) { 
+function draw_selection_rect(ctx, x1, y1, x2, y2, w) { 
     // Sorting elements;
     if (x1 > x2) {
         x1 = [x2, x2 = x1][0];
@@ -81,11 +93,17 @@ function drawRect(ctx, x1, y1, x2, y2, w) {
 /* (END) MOUSE AND SELECTION (END) */
 
 /* DRAWING FUNCTIONS */
+function get_real_coords(canv_x, canv_y) {
+    var real_x = (canv_x / canvas_w) * (cur_x2 - cur_x1) + cur_x1;
+    var real_y = (canv_y / canvas_h) * (cur_y2 - cur_y1) + cur_y1;
+    return {x: real_x, y: real_y};
+}
+
 function get_pixel_color(x, y) {
     var r, g, b;
 
-    x = Math.round(x * 15);
-    y = Math.round(y * 15);
+    x = Math.round(x * 10);
+    y = Math.round(y * 10);
 
     if (x == 0 || y == 0) 
         [r, g, b] = [255, 0, 0];
@@ -102,9 +120,10 @@ function draw_fractal() {
         for (var canv_x = 0; canv_x < canvas_w; canv_x++) {
             // real_x, real_y - real point coordinates on the complex plane.
             // canv_x, canv_y - canvas' points coordinates.
-            var real_x = (canv_x / canvas_w) * (cur_x2 - cur_x1) + cur_x1;
-            var real_y = (canv_y / canvas_h) * (cur_y2 - cur_y1) + cur_y1;
-            var color = get_pixel_color(real_x, real_y);
+            var real_coords = get_real_coords(canv_x, canv_y);
+//             var real_x = real_coords.x;
+//             var real_y = real_coords.y;
+            var color = get_pixel_color(real_coords.x, real_coords.y);
 
             frac_ctx.fillStyle = color;
             frac_ctx.fillRect(canv_x, canv_y, 1, 1);
@@ -137,7 +156,7 @@ function setup() {
 
     sel_canvas.onmousedown = function(event) {on_mouse_down(sel_canvas, event);};
     sel_canvas.onmousemove = function(event) {draw_selection(sel_canvas, event);};
-    sel_canvas.onmouseup = function(event) {on_mouse_up();};
+    sel_canvas.onmouseup = function(event) {on_mouse_up(sel_canvas, event);};
 
 
     // Finding perfect canvas resolution based on client's screen size.
