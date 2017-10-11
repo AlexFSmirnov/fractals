@@ -136,7 +136,6 @@ function draw_fractal() {
             frac_ctx.fillStyle = color;
             frac_ctx.fillRect(canv_x, canv_y, 1, 1);
         }
-        console.log(canv_y);
     }
 }
 /* (END) DRAWING FUNCTIONS (END) */
@@ -163,7 +162,7 @@ function setup() {
     sel_canvas = document.getElementById('selection-canvas');
     sel_ctx = sel_canvas.getContext('2d');
 
-    sel_canvas.addEventListener('ontouchstart', function() {alert(1)});
+    sel_canvas.addEventListener('touchstart', function() { console.log('touch'); frac_ctx.clearRect(0, 0, 100, 100); })
     sel_canvas.addEventListener('mousedown', 
         function(event) {on_mouse_down(sel_canvas, event)});
     sel_canvas.addEventListener('mousemove',
