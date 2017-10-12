@@ -1,9 +1,10 @@
 /* Script for drawing fractals on the complex plane.
  * TABLE OF CONTENTS:
  * 0. Misc functions (randint, etc);
- * 1. Mouse and selection functions.
- * 2. Drawing functions.
- * 3. Display functions.
+ * 1. Generation functions.
+ * 2. Mouse and selection functions.
+ * 3. Drawing functions.
+ * 4. Display functions.
  */
 function randint(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -12,6 +13,40 @@ function randint(min, max) {
 function mod(n, m) {
     return ((n % m) + m) % m;
 }
+
+/* GENERATION FUNCTIONS */
+
+var type = ["formula", "mandelbrot", "julia"][1];
+function get_pixel_color(x, y) {
+    var r, g, b;
+
+    if (type == "formula") {
+        r = Math.round(128 + 128 * Math.sin(x + y));
+        g = Math.round(128 + (x + y));
+        b = Math.round(128 + 128 * Math.sin(x - y));
+    } else if (type == "mandelbrot") {
+        var iterations = 150;
+        var z = new Complex(0);
+        var c = new Complex(x, y);
+        for (var i = 0; i < iterations; i++) {
+            z = z.mul(z).add(c);  // z = z ^ 2 + c;
+            if (z.abs() > 100) {
+                break;
+            }
+        }
+        var color = Math.round((255 / 32) * i);
+        r = color;
+        g = color;
+        b = color;
+    } else if (type == "julia") {
+    }
+
+
+
+    return "rgb(" + r + ", " + g + ", " + b + ")";
+}
+
+/* (END) GENERATION FUNCTIONS (END) */
 
 /* MOUSE AND SELECTION */
 is_selecting = false;
@@ -129,26 +164,6 @@ function get_real_coords(canv_x, canv_y) {
     var real_x = (canv_x / canvas_w) * (cur_x2 - cur_x1) + cur_x1;
     var real_y = (canv_y / canvas_h) * (cur_y2 - cur_y1) + cur_y1;
     return {x: real_x, y: real_y};
-}
-
-function get_pixel_color(x, y) {
-    var r, g, b;
-
-    r = Math.round(128 + 128 * Math.sin(x + y));
-    g = Math.round(128 + (x + y));
-    b = Math.round(128 + 128 * Math.sin(x - y));
-
-//     x = Math.round(x * 10);
-//     y = Math.round(y * 10);
-// 
-//     if (x == 0 || y == 0) 
-//         [r, g, b] = [255, 0, 0];
-//     else if (x % 10 == 0 || y % 10 == 0) 
-//         [r, g, b] = [150, 150, 255];
-//     else 
-//         [r, g, b] = [0, 0, 255];
-
-    return "rgb(" + r + ", " + g + ", " + b + ")";
 }
 
 function draw_fractal() {
