@@ -1,11 +1,13 @@
 /* Script for drawing fractals on the complex plane.
  * TABLE OF CONTENTS:
- * 0. Misc functions (randint, etc);
+ * 0. Misc functions (randint, mod, get, etc);
  * 1. Generation functions.
  * 2. Mouse and selection functions.
  * 3. Drawing functions.
  * 4. Display functions.
  */
+
+/* MISC FUNCTIONS */
 function randint(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -14,9 +16,26 @@ function mod(n, m) {
     return ((n % m) + m) % m;
 }
 
+function get_search_parameters() {
+    var prmstr = window.location.search.substr(1);
+    return prmstr != null && prmstr != "" ? transformToAssocArray(prmstr) : {};
+}
+
+function transformToAssocArray(prmstr) {
+    var params = {};
+    var prmarr = prmstr.split("&");
+    for ( var i = 0; i < prmarr.length; i++) {
+        var tmparr = prmarr[i].split("=");
+        params[tmparr[0]] = tmparr[1];
+    }
+    return params;
+}
+/* (END) MISC FUNCTIONS (END) */
+
 /* GENERATION FUNCTIONS */
 
-var type = ["formula", "mandelbrot", "julia"][1];
+types = ['formula', 'mandelbrot', 'julia'];
+type = types[1];
 function get_pixel_color(x, y) {
     var r, g, b;
 
@@ -203,9 +222,28 @@ function adjust_window() {
     document.getElementById('selection-canvas').style = style + "z-index: 2;";
 }
 
+function change_settings() {
+    var params = get_search_parameters();
+    var keys = Object.keys(params);
+    for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        var val = params[key];
+
+        switch(key) {
+          case 'pixel_amount':
+            PIXEL_AMOUNT = parseInt(val);
+          case 'type':
+            type = types[parseInt(val)];
+        }
+    }
+};
+
 function setup() {
     document.body.style.backgroundColor = BACKGROUND_COLOR;
     window.onresize = function(event) {adjust_window();};
+
+    // Gets settings from HTTP GET.
+    change_settings();
 
     fractal_canvas = document.getElementById('fractal-canvas');
     frac_ctx = fractal_canvas.getContext('2d');
