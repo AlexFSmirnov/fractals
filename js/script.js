@@ -15,7 +15,7 @@ function mod(n, m) {
 
 /* MOUSE AND SELECTION */
 is_selecting = false;
-strict_selection = true;
+strict_selection = false;
 function  get_mouse_pos(canvas, evt) {
     if (evt.type.startsWith("touch")) {
         var client_x = evt.touches[0].clientX;
@@ -46,6 +46,8 @@ function on_mouse_down(canvas, event) {
 function on_mouse_up(canvas, event) {
     is_selecting = false;
     sel_ctx.clearRect(0, 0, sel_canvas.width, sel_canvas.height);
+    var prev_real_w = cur_x2 - cur_x1;
+    var prev_real_h = cur_y2 - cur_y1;
     
     // Zooming in the real coordinates.
     // sel_x2, sel_y2 are global, so we have their values from draw_selection()
@@ -56,7 +58,25 @@ function on_mouse_up(canvas, event) {
     cur_x2 = real_coords_2.x;
     cur_y2 = real_coords_2.y;
 
+    // If the selection is not strict, we should resize the canvas 
+    // so that it doesn't get distorted.
+    if (!strict_selection) {
+        var client_w = document.documentElement.clientWidth;
+        var client_h = document.documentElement.clientHeight;
+        var cur_w = cur_x2 - cur_x1;
+        var cur_h = cur_y2 - cur_y1;
+        if (cur_w / cur_h < prev_real_w / prev_real_h) {
+            var new_w = Math.round(client_h * cur_w / cur_h);
+            var new_h = client_h;
+        } else {
+            var new_w = client_w;
+            var new_h = Math.round(client_w * cur_h / cur_w);
+        }
+        set_canvas_res(new_w, new_h);
+    }
+
     draw_fractal();
+    adjust_window();
 }
 
 function draw_selection(canvas, event) {
@@ -149,6 +169,16 @@ function draw_fractal() {
 /* (END) DRAWING FUNCTIONS (END) */
 
 /* DISPLAY AND SETUP */
+function set_canvas_res(client_w, client_h) {
+    var coeff = Math.sqrt(PIXEL_AMOUNT) / Math.sqrt(client_w * client_h);
+    canvas_w = Math.round(client_w * coeff);
+    canvas_h = Math.round(client_h * coeff);
+    fractal_canvas.width = canvas_w;
+    fractal_canvas.height = canvas_h;
+    sel_canvas.width = canvas_w;
+    sel_canvas.height = canvas_h;
+}
+
 function adjust_window() {
     var c_w = document.documentElement.clientWidth;
     var c_h = document.documentElement.clientHeight;
@@ -188,13 +218,7 @@ function setup() {
     // Finding perfect canvas resolution based on client's screen size.
     var client_w = document.documentElement.clientWidth;
     var client_h = document.documentElement.clientHeight;
-    var coeff = Math.sqrt(PIXEL_AMOUNT) / Math.sqrt(client_w * client_h);
-    canvas_w = Math.round(client_w * coeff);
-    canvas_h = Math.round(client_h * coeff);
-    fractal_canvas.width = canvas_w;
-    fractal_canvas.height = canvas_h;
-    sel_canvas.width = canvas_w;
-    sel_canvas.height = canvas_h;
+    set_canvas_res(client_w, client_h);
     
     var plane_w = Math.sqrt(PLANE_AREA * (client_w / client_h));
     var plane_h = Math.sqrt(PLANE_AREA * (client_h / client_w))
