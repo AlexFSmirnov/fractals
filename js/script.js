@@ -162,7 +162,9 @@ function setup() {
     sel_canvas = document.getElementById('selection-canvas');
     sel_ctx = sel_canvas.getContext('2d');
 
-    sel_canvas.addEventListener('touchstart', function() { console.log('touch'); frac_ctx.clearRect(0, 0, 100, 100); })
+    sel_canvas.addEventListener('touchstart', function() { console.log('touch'); frac_ctx.clearRect(0, 0, 100, 100); });
+    sel_canvas.addEventListener('touchmove', function() {console.log('move'); frac_ctx.fillStyle = "rgb("+randint(0, 255)+", 0, 0)"; frac_ctx.fillRect(200, 200, 100, 100);});
+    sel_canvas.addEventListener('touchend', function() {console.log('touch end'); frac_ctx.clearRect(100, 100, 100, 100); });
     sel_canvas.addEventListener('mousedown', 
         function(event) {on_mouse_down(sel_canvas, event)});
     sel_canvas.addEventListener('mousemove',
