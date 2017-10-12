@@ -81,9 +81,23 @@ function on_mouse_down(canvas, event) {
 function on_mouse_up(canvas, event) {
     is_selecting = false;
     sel_ctx.clearRect(0, 0, sel_canvas.width, sel_canvas.height);
-    var prev_real_w = cur_x2 - cur_x1;
-    var prev_real_h = cur_y2 - cur_y1;
     
+    // If the selection is not strict, we should resize the
+    // selection so that it doesn't get distorted.
+    if (!strict_selection) {
+        var sel_w = sel_x2 - sel_x1;
+        var sel_h = sel_y2 - sel_y1;
+        if (sel_w / sel_h < canvas_w / canvas_h) {
+            var new_sel_w = canvas_w * sel_h / canvas_h;
+            sel_x1 -= Math.round((new_sel_w - sel_w) / 2);
+            sel_x2 += Math.round((new_sel_w - sel_w) / 2);
+        } else {
+            var new_sel_h = canvas_h * sel_w / canvas_w;
+            sel_y1 -= Math.round((new_sel_h - sel_h) / 2);
+            sel_y2 += Math.round((new_sel_h - sel_h) / 2);
+        }
+    }
+
     // Zooming in the real coordinates.
     // sel_x2, sel_y2 are global, so we have their values from draw_selection()
     var real_coords_1 = get_real_coords(sel_x1, sel_y1);
@@ -92,23 +106,6 @@ function on_mouse_up(canvas, event) {
     cur_y1 = real_coords_1.y;
     cur_x2 = real_coords_2.x;
     cur_y2 = real_coords_2.y;
-
-    // If the selection is not strict, we should resize the canvas 
-    // so that it doesn't get distorted.
-    if (!strict_selection) {
-        var client_w = document.documentElement.clientWidth;
-        var client_h = document.documentElement.clientHeight;
-        var cur_w = cur_x2 - cur_x1;
-        var cur_h = cur_y2 - cur_y1;
-        if (cur_w / cur_h < prev_real_w / prev_real_h) {
-            var new_w = Math.round(client_h * cur_w / cur_h);
-            var new_h = client_h;
-        } else {
-            var new_w = client_w;
-            var new_h = Math.round(client_w * cur_h / cur_w);
-        }
-        set_canvas_res(new_w, new_h);
-    }
 
     draw_fractal();
     adjust_window();
