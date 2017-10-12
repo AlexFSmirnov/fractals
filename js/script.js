@@ -17,13 +17,21 @@ function mod(n, m) {
 is_selecting = false;
 strict_selection = true;
 function  get_mouse_pos(canvas, evt) {
-  var rect = canvas.getBoundingClientRect(), // abs. size of element
+    if (evt.type.startsWith("touch")) {
+        var client_x = evt.touches[0].clientX;
+        var client_y = evt.touches[0].clientY;
+    } else {
+        var client_x = evt.clientX;
+        var client_y = evt.clientY;
+    }
+    
+    var rect = canvas.getBoundingClientRect(), // abs. size of element
       scaleX = canvas.width / rect.width,    // relationship bitmap vs. element for X
       scaleY = canvas.height / rect.height;  // relationship bitmap vs. element for Y
 
   return {
-    x: (evt.clientX - rect.left) * scaleX,   // scale mouse coordinates after they have
-    y: (evt.clientY - rect.top) * scaleY     // been adjusted to be relative to element
+    x: (client_x - rect.left) * scaleX,   // scale mouse coordinates after they have
+    y: (client_y - rect.top) * scaleY     // been adjusted to be relative to element
   }
 }
 
@@ -162,9 +170,14 @@ function setup() {
     sel_canvas = document.getElementById('selection-canvas');
     sel_ctx = sel_canvas.getContext('2d');
 
-    sel_canvas.addEventListener('touchstart', function() { console.log('touch'); frac_ctx.clearRect(0, 0, 100, 100); });
-    sel_canvas.addEventListener('touchmove', function() {console.log('move'); frac_ctx.fillStyle = "rgb("+randint(0, 255)+", 0, 0)"; frac_ctx.fillRect(200, 200, 100, 100);});
-    sel_canvas.addEventListener('touchend', function() {console.log('touch end'); frac_ctx.clearRect(100, 100, 100, 100); });
+    // Touchscreen.
+    sel_canvas.addEventListener('touchstart', 
+        function(event) {on_mouse_down(sel_canvas, event)});
+    sel_canvas.addEventListener('touchmove',
+        function(event) {draw_selection(sel_canvas, event)});
+    sel_canvas.addEventListener('touchend',
+        function(event) {on_mouse_up(sel_canvas, event)});
+    // Mouse.
     sel_canvas.addEventListener('mousedown', 
         function(event) {on_mouse_down(sel_canvas, event)});
     sel_canvas.addEventListener('mousemove',
